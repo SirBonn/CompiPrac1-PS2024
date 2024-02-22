@@ -11,8 +11,6 @@ import java.io.*;
 %unicode
 %line
 %column
-%caseless
-%ignorecase
 %cup
 %public
 
@@ -20,14 +18,17 @@ import java.io.*;
 
 ENDLINE     = \r|\n|\r\n
 WHITESPCS   = [ \t\f]+ | {ENDLINE}
-
 LETTER      = [a-zA-Z]
 NUMBER      = [0-9]+
 OPERATORS   = \* | \/ | \- | \+ | \^ | \%
 SEMICOLON   = ";"
+OPNPARENT   = "("
+CLSPARENT   = ")"
+DBLEQUOTES  = "\""
+DOT         = "."
+COMMA       = ","
 //reserved Words
 SELECCIONAR = "SELECCIONAR"
-FILTRAR     = "FILTRAR"
 INSERTAR    = "INSERTAR"
 ACTUALIZAR  = "ACTUALIZAR"
 ASIGNAR     = "ASIGNAR"
@@ -50,16 +51,16 @@ OR          = "OR"
     StringBuffer sb = new StringBuffer();
 
     private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
+        return new Symbol(type, yyline+1, yycolumn+1);
     }
 
     private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
+        return new Symbol(type, yyline+1, yycolumn+1, value);
     }
 
     private void error(String message) {
-        System.out.println("Error at row:"+(yyline+1)+", col: "+(yycolumn+1)+" : "+message);
-    }
+        System.out.println("Error en linea line "+(yyline+1)+", columna "+(yycolumn+1)+" : "+message);
+      }
 %}
 
 %eofval{
@@ -68,12 +69,6 @@ OR          = "OR"
 
 %%
 
-{LETTER}                          {return symbol(ParserSym.LETTER, yytext());}
-{NUMBER}                          {return symbol(ParserSym.NUMBER, yytext());}
-{LETTER}                          {return symbol(ParserSym.LETTER, yytext());}
-{NUMBER}                          {return symbol(ParserSym.NUMBER, yytext());}
-{OPERATORS}                       {return symbol(ParserSym.OPERATOR, yytext());}
-{SEMICOLON}                       {return symbol(ParserSym.SEMICOLON, yytext());}
 {SELECCIONAR}                     {return symbol(ParserSym.SELECCIONAR, yytext());}
 {FILTRAR}                         {return symbol(ParserSym.FILTRAR, yytext());}
 {INSERTAR}                        {return symbol(ParserSym.INSERTAR, yytext());}
@@ -81,16 +76,26 @@ OR          = "OR"
 {ASIGNAR}                         {return symbol(ParserSym.ASIGNAR, yytext());}
 {ELIMINAR}                        {return symbol(ParserSym.ELIMINAR, yytext());}
 {EN}                              {return symbol(ParserSym.EN, yytext());}
-{FILTRAR}                         {return symbol(ParserSym.FILTRAR, yytext());}
 {VALORES}                         {return symbol(ParserSym.VALORES, yytext());}
+{AND}                             {return symbol(ParserSym.AND, yytext());}
+{OR}                              {return symbol(ParserSym.OR, yytext());}
+
+{LETTER}                          {return symbol(ParserSym.LETTER, yytext());}
+{NUMBER}                          {return symbol(ParserSym.NUMBER, yytext());}
+{LETTER}({LETTER}|{NUMBER})+      {return symbol(ParserSym.WORD, yytext());}
+{OPERATORS}                       {return symbol(ParserSym.OPERATOR, yytext());}
+{SEMICOLON}                       {return symbol(ParserSym.SEMICOLON, yytext());}
+{OPNPARENT}                       {return symbol(ParserSym.OPNPARENT, yytext());}
+{CLSPARENT}                       {return symbol(ParserSym.CLSPARENT, yytext());}
+{DBLEQUOTES}                      {return symbol(ParserSym.DBLEQUOTES, yytext());}
+{DOT}                             {return symbol(ParserSym.DOT, yytext());}
+{COMMA}                           {return symbol(ParserSym.COMMA, yytext());}
 {EQUAL}                           {return symbol(ParserSym.EQUAL, yytext());}
 {MINORQ}                          {return symbol(ParserSym.MINORQ, yytext());}
 {MINOR_EQ}                        {return symbol(ParserSym.MINOR_EQ, yytext());}
 {MAYORQ}                          {return symbol(ParserSym.MAYORQ, yytext());}
 {MAYOR_EQ}                        {return symbol(ParserSym.MAYOR_EQ, yytext());}
 {INEQUAL}                         {return symbol(ParserSym.INEQUAL, yytext());}
-{AND}                             {return symbol(ParserSym.AND, yytext());}
-{OR}                              {return symbol(ParserSym.OR, yytext());}
 {WHITESPCS}+                      {}
 //erores
-.                                 {return error("Unreconogized character: <" +yytext()+">");}
+.                                 {System.err.println("warning: Unrecognized character '" + yytext()+"' -- ignored" + " at : "+ (yyline+1) + " " + (yycolumn+1) + " " + yychar);}

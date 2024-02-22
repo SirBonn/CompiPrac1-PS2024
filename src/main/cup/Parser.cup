@@ -1,0 +1,57 @@
+package  com.srbn.Parser;
+
+import java_cup.runtime.*;
+
+class Parser;
+
+//terminal INSERT, SELECCIONAR, FILTRAR, EN, VALORES,
+//SEMICOLON, DBLEQUOTES, OPNPARENT, CLSPARENT, COMMA, DOT, WORD, NUMBER,
+//            OPERATOR, ;
+
+parser code{:
+
+    public void syntax_error(Symbol s){
+            System.out.println("Sintax error: " +s.value + " en la línea " + s.right+ " en la columna " + s.left);
+    }
+
+    public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
+	    System.out.println("Sintax error: " +s.value + " en la línea " + s.right+" en la columna " + s.left);
+    }
+
+:};
+
+terminal LETTER, NUMBER, WORD, OPERATOR, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
+        COMMA, SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, EN,
+        EQUAL, MINORQ, MINOR_EQ, MAYORQ, MAYOR_EQ, INEQUAL, AND, OR, VALORES;
+
+non terminal S, path, vals, valslist, colnames, value;
+
+start with S;
+
+S::=        INSERTAR:ins EN:in path:path vals:vals valslist:valslist SEMICOLON:semicolon                {:
+                                                                                                           System.out.println("INSERTAR EN ;");
+                                                                                                        :}
+    |       S INSERTAR EN path vals valslist SEMICOLON                                                  {:
+
+                                                                                                        :}
+    ;
+
+path::=     WORD DOT WORD {: System.out.println("in path");:}
+    ;
+
+vals::=     OPNPARENT value CLSPARENT VALORES {: System.out.println("in vals");:}
+    |       VALORES {: System.out.println("in vals");:}
+    ;
+
+colnames::= colnames COMMA WORD {: System.out.println("in colnames");:}
+    |       WORD    {: System.out.println("in colnames");:}
+    ;
+
+valslist::= valslist COMMA value  {: System.out.println("in valslist");:}
+    |       value    {: System.out.println("in valslist");:}
+    ;
+
+value::=    NUMBER   {: System.out.println("in value");:}
+    |       DBLEQUOTES WORD DBLEQUOTES   {: System.out.println("in value");:}
+    |       DBLEQUOTES NUMBER DBLEQUOTES     {: System.out.println("in value");:}
+    ;
