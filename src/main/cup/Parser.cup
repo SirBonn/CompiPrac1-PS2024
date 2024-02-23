@@ -11,47 +11,124 @@ class Parser;
 parser code{:
 
     public void syntax_error(Symbol s){
-            System.out.println("Sintax error: " +s.value + " en la línea " + s.right+ " en la columna " + s.left);
+            System.out.println("sintax error: " +s.value + " en la línea " + s.right+ " en la columna " + s.left);
     }
 
     public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
-	    System.out.println("Sintax error: " +s.value + " en la línea " + s.right+" en la columna " + s.left);
+	    System.out.println("unrec sintax error: " +s.value + " en la línea " + s.right+" en la columna " + s.left);
     }
 
 :};
 
-terminal LETTER, NUMBER, WORD, OPERATOR, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
-        COMMA, SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, EN,
-        EQUAL, MINORQ, MINOR_EQ, MAYORQ, MAYOR_EQ, INEQUAL, AND, OR, VALORES;
+terminal NUMBER, WORD, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
+         COMMA, SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, EN,
+         EQUAL, MINORQ, MINOR_EQ, MAYORQ, MAYOR_EQ, INEQUAL, ASTERISK, AND, OR, VALORES;
 
-non terminal S, path, vals, valslist, colnames, value;
+non terminal S, T, U, V, PROGRAM, QUERY, path, colvalues, valueslist, colnames, columns, caller, value,
+             values, filters, assignations, assignation, conditions, condition,
+             num_comparation, str_comparation, num_assign, str_assign;
 
-start with S;
+start with PROGRAM;
 
-S::=        INSERTAR:ins EN:in path:path vals:vals valslist:valslist SEMICOLON:semicolon                {:
-                                                                                                           System.out.println("INSERTAR EN ;");
-                                                                                                        :}
-    |       S INSERTAR EN path vals valslist SEMICOLON                                                  {:
-
-                                                                                                        :}
+PROGRAM::=      PROGRAM QUERY
+    |           QUERY
     ;
 
-path::=     WORD DOT WORD {: System.out.println("in path");:}
+QUERY::=        S   {: System.out.println("Insert query");:}
+    |           T   {: System.out.println("Select query");:}
+    |           U   {: System.out.println("Delete query");:}
+    |           V   {: System.out.println("Update query");:}
     ;
 
-vals::=     OPNPARENT value CLSPARENT VALORES {: System.out.println("in vals");:}
-    |       VALORES {: System.out.println("in vals");:}
+S::=            INSERTAR EN path colvalues valueslist SEMICOLON
+//    |           S INSERTAR EN path colvalues valueslist SEMICOLON
     ;
 
-colnames::= colnames COMMA WORD {: System.out.println("in colnames");:}
-    |       WORD    {: System.out.println("in colnames");:}
+T::=            SELECCIONAR caller EN path filters SEMICOLON
+//    |           T SELECCIONAR caller EN path filters SEMICOLON
     ;
 
-valslist::= valslist COMMA value  {: System.out.println("in valslist");:}
-    |       value    {: System.out.println("in valslist");:}
+U::=            ELIMINAR EN path filters SEMICOLON
+//    |           U ELIMINAR EN path filters SEMICOLON
+    ;
+V::=            ACTUALIZAR EN path ASIGNAR assignations filters SEMICOLON
     ;
 
-value::=    NUMBER   {: System.out.println("in value");:}
-    |       DBLEQUOTES WORD DBLEQUOTES   {: System.out.println("in value");:}
-    |       DBLEQUOTES NUMBER DBLEQUOTES     {: System.out.println("in value");:}
+path::=         WORD DOT WORD
+    ;
+
+colvalues::=    colnames VALORES
+    |           VALORES
+    ;
+
+colnames::=     OPNPARENT columns CLSPARENT
+    ;
+
+columns::=      columns COMMA WORD
+    |           WORD
+    ;
+
+valueslist::=   OPNPARENT values CLSPARENT
+    ;
+
+values::=       values COMMA value
+    |           value
+    ;
+
+value::=        NUMBER
+    |           DBLEQUOTES WORD   DBLEQUOTES
+    |           DBLEQUOTES NUMBER DBLEQUOTES
+    ;
+
+caller::=       columns
+    |           ASTERISK
+    ;
+
+filters::=      FILTRAR conditions
+    |
+    ;
+
+assignations::= assignations COMMA assignation
+    |           assignation
+    ;
+
+assignation::=  num_assign
+    |           str_assign
+    ;
+
+conditions::=   conditions AND condition
+    |           conditions OR condition
+    |           condition
+    ;
+
+//and_condition::=and_condition AND condition
+//    |           condition
+//    ;
+//
+//or_condition::= or_condition OR condition
+//    |           condition
+//    ;
+
+condition::=    num_comparation
+    |           str_comparation
+    ;
+
+num_assign::=   WORD EQUAL NUMBER
+    ;
+
+str_assign::=   WORD EQUAL     DBLEQUOTES NUMBER   DBLEQUOTES
+    |           WORD EQUAL     DBLEQUOTES WORD     DBLEQUOTES
+    ;
+
+num_comparation::= num_assign
+    |           WORD MAYOR_EQ NUMBER
+    |           WORD MINOR_EQ NUMBER
+    |           WORD MAYORQ   NUMBER
+    |           WORD MINORQ   NUMBER
+    |           WORD INEQUAL  NUMBER
+    ;
+
+str_comparation::= str_assign
+    |           WORD INEQUAL   DBLEQUOTES NUMBER   DBLEQUOTES
+    |           WORD INEQUAL   DBLEQUOTES WORD     DBLEQUOTES
     ;

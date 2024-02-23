@@ -20,13 +20,14 @@ ENDLINE     = \r|\n|\r\n
 WHITESPCS   = [ \t\f]+ | {ENDLINE}
 LETTER      = [a-zA-Z]
 NUMBER      = [0-9]+
-OPERATORS   = \* | \/ | \- | \+ | \^ | \%
+OPERATORS   = \/ | \- | \+ | \^ | \%
 SEMICOLON   = ";"
 OPNPARENT   = "("
 CLSPARENT   = ")"
 DBLEQUOTES  = "\""
 DOT         = "."
 COMMA       = ","
+ASTERISK   = "*"
 //reserved Words
 SELECCIONAR = "SELECCIONAR"
 INSERTAR    = "INSERTAR"
@@ -79,11 +80,9 @@ OR          = "OR"
 {VALORES}                         {return symbol(ParserSym.VALORES, yytext());}
 {AND}                             {return symbol(ParserSym.AND, yytext());}
 {OR}                              {return symbol(ParserSym.OR, yytext());}
-
-{LETTER}                          {return symbol(ParserSym.LETTER, yytext());}
+{ASTERISK}                       {return symbol(ParserSym.ASTERISK, yytext());}
 {NUMBER}                          {return symbol(ParserSym.NUMBER, yytext());}
-{LETTER}({LETTER}|{NUMBER})+      {return symbol(ParserSym.WORD, yytext());}
-{OPERATORS}                       {return symbol(ParserSym.OPERATOR, yytext());}
+({LETTER}|{NUMBER})+      {return symbol(ParserSym.WORD, yytext());}
 {SEMICOLON}                       {return symbol(ParserSym.SEMICOLON, yytext());}
 {OPNPARENT}                       {return symbol(ParserSym.OPNPARENT, yytext());}
 {CLSPARENT}                       {return symbol(ParserSym.CLSPARENT, yytext());}
