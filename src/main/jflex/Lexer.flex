@@ -80,21 +80,21 @@ OR          = "OR"
 {VALORES}                         {return symbol(ParserSym.VALORES, yytext());}
 {AND}                             {return symbol(ParserSym.AND, yytext());}
 {OR}                              {return symbol(ParserSym.OR, yytext());}
-{ASTERISK}                       {return symbol(ParserSym.ASTERISK, yytext());}
+{ASTERISK}                        {return symbol(ParserSym.ASTERISK, yytext());}
 {NUMBER}                          {return symbol(ParserSym.NUMBER, yytext());}
-({LETTER}|{NUMBER})+      {return symbol(ParserSym.WORD, yytext());}
+({LETTER}|{NUMBER})+              {return symbol(ParserSym.WORD, yytext());}
 {SEMICOLON}                       {return symbol(ParserSym.SEMICOLON, yytext());}
 {OPNPARENT}                       {return symbol(ParserSym.OPNPARENT, yytext());}
 {CLSPARENT}                       {return symbol(ParserSym.CLSPARENT, yytext());}
 {DBLEQUOTES}                      {return symbol(ParserSym.DBLEQUOTES, yytext());}
 {DOT}                             {return symbol(ParserSym.DOT, yytext());}
 {COMMA}                           {return symbol(ParserSym.COMMA, yytext());}
+{INEQUAL}                         {return symbol(ParserSym.INEQUAL, yytext());}
+{MINOR_EQ}                        {return symbol(ParserSym.MINOR_EQ, yytext());}
+{MAYOR_EQ}                        {return symbol(ParserSym.MAYOR_EQ, yytext());}
 {EQUAL}                           {return symbol(ParserSym.EQUAL, yytext());}
 {MINORQ}                          {return symbol(ParserSym.MINORQ, yytext());}
-{MINOR_EQ}                        {return symbol(ParserSym.MINOR_EQ, yytext());}
 {MAYORQ}                          {return symbol(ParserSym.MAYORQ, yytext());}
-{MAYOR_EQ}                        {return symbol(ParserSym.MAYOR_EQ, yytext());}
-{INEQUAL}                         {return symbol(ParserSym.INEQUAL, yytext());}
 {WHITESPCS}+                      {}
 //erores
-.                                 {System.err.println("warning: Unrecognized character '" + yytext()+"' -- ignored" + " at : "+ (yyline+1) + " " + (yycolumn+1) + " " + yychar);}
+.                                 {System.err.println("warning: Unrecognized character '" + yytext()+"' -- ignored" + " at : "+ (yycolumn+1) + " " + (yyline+1) + " " + yychar);}

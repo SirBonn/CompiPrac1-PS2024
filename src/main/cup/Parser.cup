@@ -1,6 +1,7 @@
 package  com.srbn.Parser;
 
 import java_cup.runtime.*;
+import com.srbn.Obj.*;
 
 class Parser;
 
@@ -20,64 +21,94 @@ parser code{:
 
 :};
 
-terminal NUMBER, WORD, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
-         COMMA, SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, EN,
-         EQUAL, MINORQ, MINOR_EQ, MAYORQ, MAYOR_EQ, INEQUAL, ASTERISK, AND, OR, VALORES;
+terminal     NUMBER, WORD, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
+             COMMA, SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, EN,
+             EQUAL, MINORQ, MINOR_EQ, MAYORQ, MAYOR_EQ, INEQUAL, ASTERISK, AND, OR, VALORES;
 
-non terminal S, T, U, V, PROGRAM, QUERY, path, colvalues, valueslist, colnames, columns, caller, value,
-             values, filters, assignations, assignation, conditions, condition,
+non terminal Value value, values, valueslist;
+non terminal Column colnames, columns, colvalues, caller;
+non terminal Query S, T, U, V, PROGRAM, QUERY, path,
+             filters, assignations, assignation, conditions, condition,
              num_comparation, str_comparation, num_assign, str_assign;
 
 start with PROGRAM;
 
-PROGRAM::=      PROGRAM QUERY
-    |           QUERY
+PROGRAM::=      PROGRAM:prog QUERY:qa                                                           {:
+                                                                                                    prog.addQuery(qa);
+                                                                                                    RESULT = prog;
+                                                                                                :}
+    |           QUERY:qa                                                                        {:
+                                                                                                    Query queries = new Query();
+                                                                                                    queries.addQuery(qa);
+                                                                                                    RESULT = queries;
+                                                                                                :}
     ;
 
-QUERY::=        S   {: System.out.println("Insert query");:}
-    |           T   {: System.out.println("Select query");:}
-    |           U   {: System.out.println("Delete query");:}
-    |           V   {: System.out.println("Update query");:}
+QUERY::=        S:s                                                                             {: RESULT = s; System.out.println("s query");:}
+    |           T:t                                                                             {: System.out.println("t query");:}
+    |           U:u                                                                             {: System.out.println("u query");:}
+    |           V:v                                                                             {: System.out.println("v query");:}
     ;
 
-S::=            INSERTAR EN path colvalues valueslist SEMICOLON
-//    |           S INSERTAR EN path colvalues valueslist SEMICOLON
+S::=            INSERTAR EN path:path colvalues:colvalues valueslist:valuesl SEMICOLON          {:  path.setType(QueryType.INSERTAR.ordinal());
+                                                                                                    path.setColumns(colvalues.getColumns());
+                                                                                                    path.setValues(valuesl.getValues());
+                                                                                                    RESULT=path;
+                                                                                                :}
     ;
 
-T::=            SELECCIONAR caller EN path filters SEMICOLON
-//    |           T SELECCIONAR caller EN path filters SEMICOLON
+//-----------------------------------------------------------------------------------------------------------------------------------------
+
+T::=            SELECCIONAR caller EN path filters SEMICOLON                    {: System.out.println("Select query");:}
     ;
 
-U::=            ELIMINAR EN path filters SEMICOLON
-//    |           U ELIMINAR EN path filters SEMICOLON
+U::=            ELIMINAR EN path filters SEMICOLON                              {: System.out.println("delete query");:}
     ;
-V::=            ACTUALIZAR EN path ASIGNAR assignations filters SEMICOLON
-    ;
-
-path::=         WORD DOT WORD
+V::=            ACTUALIZAR EN path ASIGNAR assignations filters SEMICOLON       {: System.out.println("update query");:}
     ;
 
-colvalues::=    colnames VALORES
-    |           VALORES
+path::=         WORD:proy DOT:dot WORD:file                                     {:
+                                                                                    System.out.println("path query");
+                                                                                    Query query = new Query();
+                                                                                    RESULT = query;
+                                                                                :}
     ;
 
-colnames::=     OPNPARENT columns CLSPARENT
+colvalues::=    colnames:cln VALORES:valores                                    {: RESULT = cln;:}
+    |           VALORES:valores                                                 {: RESULT = new Column();:}
     ;
 
-columns::=      columns COMMA WORD
-    |           WORD
+colnames::=     OPNPARENT columns:colns CLSPARENT                               {: RESULT = colns;:}
     ;
 
-valueslist::=   OPNPARENT values CLSPARENT
+columns::=      columns:columns COMMA WORD:word                                 {:
+                                                                                    columns.addColumn(new Column(word.toString()));
+                                                                                    RESULT = columns;
+                                                                                :}
+    |           WORD:word                                                       {:
+                                                                                    Column columns = new Column();
+                                                                                    columns.addColumn(new Column(word.toString()));
+                                                                                    RESULT = columns;
+                                                                                :}
     ;
 
-values::=       values COMMA value
-    |           value
+valueslist::=   OPNPARENT values:vals CLSPARENT                                  {: RESULT = vals;:}
     ;
 
-value::=        NUMBER
-    |           DBLEQUOTES WORD   DBLEQUOTES
-    |           DBLEQUOTES NUMBER DBLEQUOTES
+values::=       values:vals COMMA value:val                                     {:
+                                                                                    vals.addValue(val);
+                                                                                    RESULT = vals;
+                                                                                :}
+    |           value:val                                                       {:
+                                                                                    Value value = new Value();
+                                                                                    value.addValue(val);
+                                                                                    RESULT = value;
+                                                                                :}
+    ;
+
+value::=        NUMBER:num                                                      {: RESULT = new Value(Integer.parseInt(num.toString()));:}
+    |           DBLEQUOTES WORD:word   DBLEQUOTES                               {: RESULT = new Value(word.toString());:}
+    |           DBLEQUOTES NUMBER:num  DBLEQUOTES                               {: RESULT = new Value(num.toString());:}
     ;
 
 caller::=       columns
@@ -100,14 +131,6 @@ conditions::=   conditions AND condition
     |           conditions OR condition
     |           condition
     ;
-
-//and_condition::=and_condition AND condition
-//    |           condition
-//    ;
-//
-//or_condition::= or_condition OR condition
-//    |           condition
-//    ;
 
 condition::=    num_comparation
     |           str_comparation
