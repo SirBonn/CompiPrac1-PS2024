@@ -6,34 +6,38 @@ import java.util.List;
 public class Query {
 
     private int type;
+    private String path;
     private List<Column> columns;
     private List<Value> values;
-    private List<Condition> conditions;
+    private List<Statement> assignations;
+
+    private List<Statement> statements;
 
     private List<Query> queries;
 
     public Query() {
         this.columns = new ArrayList<>();
         this.values = new ArrayList<>();
-        this.conditions = new ArrayList<>();
+        this.statements = new ArrayList<>();
         this.queries = new ArrayList<>();
     }
 
-//    public Query(int type, List<String> columns, List<Value> values) {
-//
-//    }
-
-
-    public void addQuery(Query query){
+    public void addQuery(Query query) {
         queries.add(query);
     }
 
-    public void addValue(Value value){
+    public void addValue(Value value) {
         values.add(value);
     }
 
     //getters n setters
+    public String getPath() {
+        return path;
+    }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public List<Column> getColumns() {
         return columns;
@@ -51,8 +55,6 @@ public class Query {
         this.type = type;
     }
 
-
-
     public List<Value> getValues() {
         return values;
     }
@@ -61,11 +63,19 @@ public class Query {
         this.values = values;
     }
 
-    public List<Condition> getConditions() {
-        return conditions;
+    public List<Statement> getAssignations() {
+        return assignations;
     }
 
-    public void setConditions(List<Condition> conditions) {
-        this.conditions = conditions;
+    public void setAssignations(List<Statement> assignations) {
+        this.assignations = assignations;
+    }
+
+    public List<Statement> getStatements() {
+        return statements;
+    }
+
+    public void setStatements(List<Statement> statements) {
+        this.statements = statements;
     }
 }

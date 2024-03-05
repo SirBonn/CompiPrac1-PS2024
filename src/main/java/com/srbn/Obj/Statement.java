@@ -9,10 +9,10 @@ public class Statement {
     private String sign;
     private String value;
 
-    private List<Statement> conditions;
+    private List<Statement> statements;
 
     public Statement() {
-        this.conditions = new ArrayList<>();
+        this.statements = new ArrayList<>();
     }
 
     public Statement(String column, String sign, String value) {
@@ -21,8 +21,8 @@ public class Statement {
         this.value = value;
     }
 
-    public addCondition(Statement condition){
-        this.conditions.add(condition);
+    public void addStatement(Statement statement){
+        this.statements.add(statement);
     }
 
     //getters n setters
@@ -50,11 +50,11 @@ public class Statement {
         this.value = value;
     }
 
-    public List<Statement> getConditions() {
-        return conditions;
+    public List<Statement> getStatements() {
+        return statements;
     }
 
-    public void setConditions(List<Statement> conditions) {
-        this.conditions = conditions;
+    public void setStatements(List<Statement> statements) {
+        this.statements = statements;
     }
 }
