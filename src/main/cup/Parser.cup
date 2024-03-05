@@ -5,9 +5,6 @@ import com.srbn.Obj.*;
 
 class Parser;
 
-//terminal INSERT, SELECCIONAR, FILTRAR, EN, VALORES,
-//SEMICOLON, DBLEQUOTES, OPNPARENT, CLSPARENT, COMMA, DOT, WORD, NUMBER,
-//            OPERATOR, ;
 
 parser code{:
 
@@ -27,9 +24,10 @@ terminal     NUMBER, WORD, SEMICOLON, OPNPARENT, CLSPARENT, DBLEQUOTES, DOT,
 
 non terminal Value value, values, valueslist;
 non terminal Column colnames, columns, colvalues, caller;
-non terminal Query S, T, U, V, PROGRAM, QUERY, path,
-             filters, assignations, assignation, conditions, condition,
-             num_comparation, str_comparation, num_assign, str_assign;
+non terminal Statement filters, statements, statement, num_comparation, str_comparation,
+             num_assign, str_assign, assignations, assignation;
+non terminal String path;
+non terminal Query S, T, U, V, PROGRAM, QUERY;
 
 start with PROGRAM;
 
@@ -45,40 +43,70 @@ PROGRAM::=      PROGRAM:prog QUERY:qa                                           
     ;
 
 QUERY::=        S:s                                                                             {: RESULT = s; System.out.println("s query");:}
-    |           T:t                                                                             {: System.out.println("t query");:}
-    |           U:u                                                                             {: System.out.println("u query");:}
-    |           V:v                                                                             {: System.out.println("v query");:}
+    |           T:t                                                                             {: RESULT = t; System.out.println("t query");:}
+    |           U:u                                                                             {: RESULT = u; System.out.println("u query");:}
+    |           V:v                                                                             {: RESULT = v; System.out.println("v query");:}
     ;
 
-S::=            INSERTAR EN path:path colvalues:colvalues valueslist:valuesl SEMICOLON          {:  path.setType(QueryType.INSERTAR.ordinal());
-                                                                                                    path.setColumns(colvalues.getColumns());
-                                                                                                    path.setValues(valuesl.getValues());
-                                                                                                    RESULT=path;
+S::=            INSERTAR EN path:path colvalues:colvalues valueslist:valuesl SEMICOLON          {:
+                                                                                                    Query query = new Query();
+                                                                                                    query.setPath(path);
+                                                                                                    query.setType(QueryType.INSERTAR.ordinal());
+                                                                                                    query.setColumns(colvalues.getColumns());
+                                                                                                    query.setValues(valuesl.getValues());
+                                                                                                    RESULT = query;
+                                                                                                :}
+    ;
+
+T::=            SELECCIONAR caller:call EN path:path filters:filter SEMICOLON                   {:
+                                                                                                    Query query = new Query();
+                                                                                                    query.setType(QueryType.SELECCIONAR.ordinal());
+                                                                                                    query.setColumns(call.getColumns());
+                                                                                                    query.setPath(path);
+                                                                                                    query.setStatements(filter.getStatements());
+                                                                                                    RESULT = query;
+                                                                                                :}
+    ;
+
+U::=            ELIMINAR EN path:path filters:filter SEMICOLON                                  {:
+                                                                                                    Query query = new Query();
+                                                                                                    query.setType(QueryType.ELIMINAR.ordinal());
+                                                                                                    query.setPath(path);
+                                                                                                    query.setStatements(filter.getStatements());
+                                                                                                    RESULT = query;
+                                                                                                :}
+    ;
+V::=            ACTUALIZAR EN path:path ASIGNAR assignations:assign filters:filter SEMICOLON    {:
+                                                                                                    Query query = new Query();
+                                                                                                    query.setType(QueryType.ACTUALIZAR.ordinal());
+                                                                                                    query.setPath(path);
+                                                                                                    query.setAssignations(assign.getStatements());
+                                                                                                    query.setStatements(filter.getStatements());
+                                                                                                    RESULT = query;
                                                                                                 :}
     ;
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 
-T::=            SELECCIONAR caller EN path filters SEMICOLON                    {: System.out.println("Select query");:}
-    ;
-
-U::=            ELIMINAR EN path filters SEMICOLON                              {: System.out.println("delete query");:}
-    ;
-V::=            ACTUALIZAR EN path ASIGNAR assignations filters SEMICOLON       {: System.out.println("update query");:}
-    ;
 
 path::=         WORD:proy DOT:dot WORD:file                                     {:
                                                                                     System.out.println("path query");
-                                                                                    Query query = new Query();
-                                                                                    RESULT = query;
+                                                                                    String path = proy.toString() + dot.toString() + file.toString();
+                                                                                    RESULT = path;
                                                                                 :}
     ;
 
-colvalues::=    colnames:cln VALORES:valores                                    {: RESULT = cln;:}
-    |           VALORES:valores                                                 {: RESULT = new Column();:}
+colvalues::=    colnames:cln VALORES:valores                                    {:
+                                                                                    RESULT = cln;
+                                                                                :}
+    |           VALORES:valores                                                 {:
+                                                                                    RESULT = new Column();
+                                                                                :}
     ;
 
-colnames::=     OPNPARENT columns:colns CLSPARENT                               {: RESULT = colns;:}
+colnames::=     OPNPARENT columns:colns CLSPARENT                               {:
+                                                                                    RESULT = colns;
+                                                                                :}
     ;
 
 columns::=      columns:columns COMMA WORD:word                                 {:
@@ -92,7 +120,9 @@ columns::=      columns:columns COMMA WORD:word                                 
                                                                                 :}
     ;
 
-valueslist::=   OPNPARENT values:vals CLSPARENT                                  {: RESULT = vals;:}
+valueslist::=   OPNPARENT values:vals CLSPARENT                                 {:
+                                                                                    RESULT = vals;
+                                                                                :}
     ;
 
 values::=       values:vals COMMA value:val                                     {:
@@ -106,52 +136,145 @@ values::=       values:vals COMMA value:val                                     
                                                                                 :}
     ;
 
-value::=        NUMBER:num                                                      {: RESULT = new Value(Integer.parseInt(num.toString()));:}
-    |           DBLEQUOTES WORD:word   DBLEQUOTES                               {: RESULT = new Value(word.toString());:}
-    |           DBLEQUOTES NUMBER:num  DBLEQUOTES                               {: RESULT = new Value(num.toString());:}
+value::=        NUMBER:num                                                      {:
+                                                                                    RESULT = new Value(Integer.parseInt(num.toString()));
+                                                                                :}
+    |           DBLEQUOTES WORD:word   DBLEQUOTES                               {:
+                                                                                    RESULT = new Value(word.toString());
+                                                                                :}
+    |           DBLEQUOTES NUMBER:num  DBLEQUOTES                               {:
+                                                                                    RESULT = new Value(num.toString());
+                                                                                :}
     ;
 
-caller::=       columns
-    |           ASTERISK
+caller::=       columns:cols                                                    {:
+                                                                                    RESULT = cols;
+                                                                                :}
+    |           ASTERISK                                                        {:
+                                                                                    RESULT = new Column();
+                                                                                :}
     ;
 
-filters::=      FILTRAR conditions
-    |
+filters::=      FILTRAR statements:statements                                   {:
+                                                                                    RESULT = statements;
+                                                                                :}
+    |                                                                           {:
+                                                                                    RESULT = new Statement();
+                                                                                :}
     ;
 
-assignations::= assignations COMMA assignation
-    |           assignation
+assignations::= assignations:assings COMMA assignation:assing                   {:
+                                                                                    assings.addStatement(assing);
+                                                                                    RESULT = assings;
+                                                                                :}
+    |           assignation:assing                                              {:
+                                                                                    Statement assings = new Statement();
+                                                                                    assings.addStatement(assing);
+                                                                                    RESULT = assings;
+                                                                                :}
     ;
 
-assignation::=  num_assign
-    |           str_assign
+assignation::=  num_assign:numass                                               {:
+                                                                                    RESULT = numass;
+                                                                                :}
+    |           str_assign:strass                                               {:
+                                                                                    RESULT = strass;
+                                                                                :}
     ;
 
-conditions::=   conditions AND condition
-    |           conditions OR condition
-    |           condition
+statements::=   statements:conds AND statement:cond                             {:
+                                                                                    conds.addStatement(cond);
+                                                                                    RESULT = conds;
+                                                                                :}
+    |           statements:conds OR statement:cond                              {:
+                                                                                    conds.addStatement(cond);
+                                                                                    RESULT = cond;
+                                                                                :}
+    |           statement:cond                                                  {:
+                                                                                    Statement statements = new Statement();
+                                                                                    statements.addStatement(cond);
+                                                                                    RESULT = statements;
+                                                                                :}
     ;
 
-condition::=    num_comparation
-    |           str_comparation
+statement::=    num_comparation:numcomp                                         {:
+                                                                                    RESULT = numcomp;
+                                                                                :}
+    |           str_comparation:strcomp                                         {:
+                                                                                    RESULT = strcomp;
+                                                                                :}
     ;
 
-num_assign::=   WORD EQUAL NUMBER
+num_assign::=   WORD:wrd EQUAL:symb NUMBER:num                                  {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
     ;
 
-str_assign::=   WORD EQUAL     DBLEQUOTES NUMBER   DBLEQUOTES
-    |           WORD EQUAL     DBLEQUOTES WORD     DBLEQUOTES
+str_assign::=   WORD:wrd EQUAL:symb     DBLEQUOTES NUMBER:num   DBLEQUOTES      {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd EQUAL:symb     DBLEQUOTES WORD:wrd2     DBLEQUOTES     {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), wrd2.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
     ;
 
-num_comparation::= num_assign
-    |           WORD MAYOR_EQ NUMBER
-    |           WORD MINOR_EQ NUMBER
-    |           WORD MAYORQ   NUMBER
-    |           WORD MINORQ   NUMBER
-    |           WORD INEQUAL  NUMBER
+num_comparation::= num_assign:numass                                            {:
+                                                                                    RESULT = numass;
+                                                                                :}
+    |           WORD:wrd MAYOR_EQ:symb NUMBER:num                               {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd MINOR_EQ:symb NUMBER:num                               {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd MAYORQ:symb   NUMBER:num                               {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd MINORQ:symb   NUMBER:num                               {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd INEQUAL:symb  NUMBER:num                               {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
     ;
 
-str_comparation::= str_assign
-    |           WORD INEQUAL   DBLEQUOTES NUMBER   DBLEQUOTES
-    |           WORD INEQUAL   DBLEQUOTES WORD     DBLEQUOTES
+str_comparation::= str_assign:strass                                            {:
+                                                                                    RESULT = strass;
+                                                                                :}
+    |           WORD:wrd INEQUAL:symb   DBLEQUOTES NUMBER:num   DBLEQUOTES      {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), num.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
+    |           WORD:wrd INEQUAL:symb   DBLEQUOTES WORD:wrd2     DBLEQUOTES     {:
+                                                                                    Statement statements = new Statement();
+                                                                                    Statement stat = new Statement(wrd.toString(), symb.toString(), wrd2.toString());
+                                                                                    statements.addStatement(stat);
+                                                                                    RESULT = statements;
+                                                                                :}
     ;
