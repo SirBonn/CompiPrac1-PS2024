@@ -22,7 +22,7 @@ import javax.swing.tree.DefaultTreeModel;
 public class SQLideMainUI extends javax.swing.JFrame {
 
     JtreeManager jtr = new JtreeManager();
-
+    String ActualFold;
     /**
      * Creates new form SQLideMainUI
      */
@@ -99,7 +99,7 @@ public class SQLideMainUI extends javax.swing.JFrame {
             }
         });
 
-        buttonsFilesPane.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        buttonsFilesPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         openFileButton.setText("Open");
         openFileButton.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -111,8 +111,13 @@ public class SQLideMainUI extends javax.swing.JFrame {
 
         newFileButton.setText("NewFile");
         newFileButton.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        newFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newFileButtonActionPerformed(evt);
+            }
+        });
 
-        saveButton.setText("Guardar");
+        saveButton.setText("NewFolder");
         saveButton.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         javax.swing.GroupLayout buttonsFilesPaneLayout = new javax.swing.GroupLayout(buttonsFilesPane);
@@ -125,7 +130,7 @@ public class SQLideMainUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(newFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(saveButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         buttonsFilesPaneLayout.setVerticalGroup(
@@ -185,7 +190,7 @@ public class SQLideMainUI extends javax.swing.JFrame {
             Lexer lex = new Lexer(new StringReader(sourceCodeTextArea.getText()));
             Parser sintax = new Parser(lex);
             Query query = (Query) sintax.parse().value;
-            System.out.println(sourceCodeTextArea.getText());
+            query.printQueries();
         } catch (Exception e) {
             System.out.println("----> " + e.getMessage());
             e.printStackTrace();
@@ -200,17 +205,24 @@ public class SQLideMainUI extends javax.swing.JFrame {
         JFrame frame = new JFrame("File Tree Example");
         frame.setSize(400, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
         int result = fileChooser.showOpenDialog(frame);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFolder = fileChooser.getSelectedFile();
+            ActualFold = selectedFolder.getPath();
             DefaultMutableTreeNode rootNode = jtr.createFileTree(selectedFolder);
             DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
-            jtr.addSelectionNodes(filesTree, csvTextArea, selectedFolder.getPath());
+            jtr.addSelectionNodes(filesTree, csvTextArea, ActualFold);
             filesTree.setModel(treeModel);
             filesTree.setVisible(true);
         }
     }//GEN-LAST:event_openFileButtonActionPerformed
+    
+    private void newFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newFileButtonActionPerformed
+        
+        
+        
+    }//GEN-LAST:event_newFileButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -2,6 +2,7 @@ package com.srbn.obj;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.srbn.utils.CSVmagnament.CSVManager;
 
 public class Query {
@@ -23,37 +24,45 @@ public class Query {
         this.queries = new ArrayList<>();
     }
 
+    private void executeQuery(Query query) {
 
-    public void executeQuery() {
-
-        switch (type) {
-            case QueryType.INSERTAR:
-                CSVManager.createCSVFile(path, columns, values);
+        switch (query.type) {
+            case 0:
+                //CSVManager.createCSVFile(path, columns, values);
+                break;
+            case 1:
+                //CSVManager.readCSVFile(path);
                 break;
             case 2:
-                CSVManager.readCSVFile(path);
+                //CSVManager.updateCSVFile(path, assignations, statements);
                 break;
             case 3:
-                CSVManager.updateCSVFile(path, assignations, statements);
+                //CSVManager.deleteCSVFile(path, statements);
                 break;
             case 4:
-                CSVManager.deleteCSVFile(path, statements);
+                //CSVManager.createCSVFile(path, columns, values);
                 break;
             case 5:
-                CSVManager.createCSVFile(path, columns, values);
+                //CSVManager.readCSVFile(path);
                 break;
             case 6:
-                CSVManager.readCSVFile(path);
+                //CSVManager.updateCSVFile(path, assignations, statements);
                 break;
             case 7:
-                CSVManager.updateCSVFile(path, assignations, statements);
+                //CSVManager.deleteCSVFile(path, statements);
                 break;
-            case 8:
-                CSVManager.deleteCSVFile(path, statements);
-                break;
+            default:
+
         }
 
     }
+
+    public void execute(){
+        for (Query q: queries) {
+            executeQuery(q);
+        }
+    }
+
     public void addQuery(Query query) {
         queries.add(query);
     }
@@ -111,5 +120,24 @@ public class Query {
         this.statements = statements;
     }
 
-    
+    public void printQueries() {
+        for (Query q : queries) {
+
+            System.out.println("Query: type=" + q.getType() + " path=" + q.getPath() + " columns=" + q.getColumns() +
+                    " values=" + q.getValues() + " assignations=" + q.getAssignations() + " statements=" + q.getStatements() + "\n");
+
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Query{" +
+                "type=" + type +
+                ", path='" + path + '\'' +
+                ", columns=" + columns +
+                ", values=" + values +
+                ", assignations=" + assignations +
+                ", statements=" + statements +
+                '}'+'\n';
+    }
 }

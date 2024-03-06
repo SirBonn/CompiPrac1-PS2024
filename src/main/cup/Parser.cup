@@ -96,6 +96,16 @@ path::=         WORD:proy DOT:dot WORD:file                                     
                                                                                 :}
     ;
 
+caller::=       columns:cols                                                    {:
+                                                                                    Column columns = new Column();
+                                                                                    columns.addColumn(cols);
+                                                                                    RESULT = columns;
+                                                                                :}
+    |           ASTERISK                                                        {:
+                                                                                    RESULT = new Column();
+                                                                                :}
+    ;
+
 colvalues::=    colnames:cln VALORES:valores                                    {:
                                                                                     RESULT = cln;
                                                                                 :}
@@ -104,8 +114,10 @@ colvalues::=    colnames:cln VALORES:valores                                    
                                                                                 :}
     ;
 
-colnames::=     OPNPARENT columns:colns CLSPARENT                               {:
-                                                                                    RESULT = colns;
+colnames::=     OPNPARENT columns:cols CLSPARENT                               {:
+                                                                                    Column columns = new Column();
+                                                                                    columns.addColumn(cols);
+                                                                                    RESULT = columns;
                                                                                 :}
     ;
 
@@ -137,23 +149,23 @@ values::=       values:vals COMMA value:val                                     
     ;
 
 value::=        NUMBER:num                                                      {:
-                                                                                    RESULT = new Value(Integer.parseInt(num.toString()));
+                                                                                    Value value = new Value();
+                                                                                    value.addValue(new Value(Integer.parseInt(num.toString())));
+                                                                                    RESULT = value;
                                                                                 :}
     |           DBLEQUOTES WORD:word   DBLEQUOTES                               {:
-                                                                                    RESULT = new Value(word.toString());
+                                                                                    Value value = new Value();
+                                                                                    value.addValue(new Value(word.toString()));
+                                                                                    RESULT = value;
                                                                                 :}
     |           DBLEQUOTES NUMBER:num  DBLEQUOTES                               {:
-                                                                                    RESULT = new Value(num.toString());
+                                                                                    Value value = new Value();
+                                                                                    value.addValue(new Value(num.toString()));
+                                                                                    RESULT = value;
                                                                                 :}
     ;
 
-caller::=       columns:cols                                                    {:
-                                                                                    RESULT = cols;
-                                                                                :}
-    |           ASTERISK                                                        {:
-                                                                                    RESULT = new Column();
-                                                                                :}
-    ;
+
 
 filters::=      FILTRAR statements:statements                                   {:
                                                                                     RESULT = statements;
@@ -188,7 +200,7 @@ statements::=   statements:conds AND statement:cond                             
                                                                                 :}
     |           statements:conds OR statement:cond                              {:
                                                                                     conds.addStatement(cond);
-                                                                                    RESULT = cond;
+                                                                                    RESULT = conds;
                                                                                 :}
     |           statement:cond                                                  {:
                                                                                     Statement statements = new Statement();

@@ -38,5 +38,14 @@ public class Column {
         this.columns = columns;
     }
 
-
+    @Override
+    public String toString() {
+        String str ="";
+        if(columns != null){
+            for (Column col: columns){
+                str+=" "+col.name+",";
+            }
+        }
+        return str;
+    }
 }

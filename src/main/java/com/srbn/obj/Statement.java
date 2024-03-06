@@ -21,7 +21,7 @@ public class Statement {
         this.value = value;
     }
 
-    public void addStatement(Statement statement){
+    public void addStatement(Statement statement) {
         this.statements.add(statement);
     }
 
@@ -57,4 +57,16 @@ public class Statement {
     public void setStatements(List<Statement> statements) {
         this.statements = statements;
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+        if(statements != null){
+            for (Statement statement : statements) {
+                str += statement.column + " " + statement.sign + " " + statement.value + ", ";
+            }
+        }
+        return str;
+    }
+
 }

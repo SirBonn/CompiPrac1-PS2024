@@ -50,4 +50,21 @@ public class Value {
     public void setValues(List<Value> values) {
         this.values = values;
     }
+
+    @Override
+    public String toString() {
+        String str = "";
+        if (values != null) {
+            for (Value value : values) {
+                if (value.valueInt != 0) {
+                    str += String.valueOf(value.valueInt) + " ";
+                }
+                if (value.valueStr != null) {
+                    str += value.valueStr + " ";
+                }
+            }
+        }
+        return str;
+    }
+
 }

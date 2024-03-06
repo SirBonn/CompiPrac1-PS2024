@@ -170,8 +170,8 @@
     <Container class="javax.swing.JPanel" name="buttonsFilesPane">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
-            <LineBorder/>
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
           </Border>
         </Property>
       </Properties>
@@ -185,7 +185,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="newFileButton" min="-2" pref="53" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="saveButton" min="-2" pref="53" max="-2" attributes="0"/>
+                  <Component id="saveButton" min="-2" pref="70" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -227,10 +227,13 @@
               </Border>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newFileButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="saveButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Guardar"/>
+            <Property name="text" type="java.lang.String" value="NewFolder"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
                 <TitledBorder/>
