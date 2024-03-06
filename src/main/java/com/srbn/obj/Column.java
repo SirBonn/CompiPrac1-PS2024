@@ -1,4 +1,4 @@
-package com.srbn.Obj;
+package com.srbn.obj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,4 +37,6 @@ public class Column {
     public void setColumns(List<Column> columns) {
         this.columns = columns;
     }
+
+
 }

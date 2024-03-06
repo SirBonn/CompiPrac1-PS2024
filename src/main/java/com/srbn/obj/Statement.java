@@ -1,4 +1,4 @@
-package com.srbn.Obj;
+package com.srbn.obj;
 
 import java.util.ArrayList;
 import java.util.List;

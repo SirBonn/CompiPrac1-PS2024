@@ -1,7 +1,8 @@
-package com.srbn.Obj;
+package com.srbn.obj;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.srbn.utils.CSVmagnament.CSVManager;
 
 public class Query {
 
@@ -22,6 +23,37 @@ public class Query {
         this.queries = new ArrayList<>();
     }
 
+
+    public void executeQuery() {
+
+        switch (type) {
+            case QueryType.INSERTAR:
+                CSVManager.createCSVFile(path, columns, values);
+                break;
+            case 2:
+                CSVManager.readCSVFile(path);
+                break;
+            case 3:
+                CSVManager.updateCSVFile(path, assignations, statements);
+                break;
+            case 4:
+                CSVManager.deleteCSVFile(path, statements);
+                break;
+            case 5:
+                CSVManager.createCSVFile(path, columns, values);
+                break;
+            case 6:
+                CSVManager.readCSVFile(path);
+                break;
+            case 7:
+                CSVManager.updateCSVFile(path, assignations, statements);
+                break;
+            case 8:
+                CSVManager.deleteCSVFile(path, statements);
+                break;
+        }
+
+    }
     public void addQuery(Query query) {
         queries.add(query);
     }
@@ -78,4 +110,6 @@ public class Query {
     public void setStatements(List<Statement> statements) {
         this.statements = statements;
     }
+
+    
 }
